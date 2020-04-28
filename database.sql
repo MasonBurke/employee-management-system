@@ -22,3 +22,4 @@ CREATE TABLE employee(
     manger_id INT
 );
 
+SELECT * FROM employee;
