@@ -102,6 +102,7 @@ async function addEmployees(){
     await DB.plusEmployees(employee)
     loadPrompts()
 
+    
 }
 
 
