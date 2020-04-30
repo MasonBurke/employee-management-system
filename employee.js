@@ -58,57 +58,123 @@ async function loadPrompts() {
     }
 }
 
-async function viewDepartments(){
-const departments = await DB.allDepartments()
-console.table(departments)
-loadPrompts()
+async function viewDepartments() {
+    const departments = await DB.allDepartments()
+    console.table(departments)
+    loadPrompts()
 }
 
-async function viewRoles(){
+async function viewRoles() {
     const roles = await DB.allRoles()
     console.table(roles)
     loadPrompts()
 }
 
-async function viewEmployees(){
+async function viewEmployees() {
     const employee = await DB.allEmployees()
     console.table(employee)
     loadPrompts()
 }
 
-async function addEmployees(){
+async function addEmployees() {
     const roles = await DB.allRoles()
-    const employee = await prompt ([
-       {
-           name: "first_name",
-           message: "What is your employees first name?"
-       } ,{
-           name: "Last_name",
-           message: "what is your employees last name?"
-       }
+    const employee = await prompt([
+        {
+            name: "first_name",
+            message: "What is your employees first name?"
+        }, {
+            name: "Last_name",
+            message: "what is your employees last name?"
+        }
     ])
+    const roleChoices = roles.map(({ id, title }) => ({
+        name: title,
+        value: id
+    }))
+
+    const { roleId } = await prompt({
+        type: "list",
+        name: "roleId",
+        message: "What is the employees role?",
+        choices: roleChoices
+    })
+    employee.role_id = roleId
+    await DB.plusEmployees(employee)
+    loadPrompts()
+}
+
+async function addDepartments() {
+    const depart = await prompt([
+        {
+            name: "name",
+            message: "What would you like to name the new department?"
+        }
+    ])
+
+
+    await DB.plusDepartments(depart)
+    console.log(depart.name)
+    loadPrompts()
+}
+
+async function addRoles(){
+    const departments = await DB.allDepartments()
+    const departmentChoices = departments.map(({id, name})=>({
+        name: name,
+        value: id
+    }))
+
+    const role = await prompt ([
+        {
+            name: "title",
+            message: "What would you like to name your new role?"
+        },{
+            name: "salary",
+            message:"What is the salary for your new role?"
+        },{
+            type: "list",
+            name: "department_id",
+            message: "Which department does the role belong to?",
+            choices: departmentChoices
+        }
+    ])
+        await DB.plusRoles(role)
+        loadPrompts()
+}
+
+async function updateRoles(){
+    const employees = await DB.allEmployees()
+    const employeeChoices = employees.map(({id, first_name, last_name})=>({
+       name: `${first_name} ${last_name}`,
+       value: id 
+    }))
+    const {employeeId} = await prompt([
+        {
+        type: "list",
+        name: "employeeId",
+        message: "Which employee role would you like to update?",
+        choices: employeeChoices
+        }
+    ])
+    const roles = await DB.allRoles()
     const roleChoices = roles.map(({id, title})=>({
         name: title,
         value: id
     }))
 
-    const {roleId} = await prompt ({
-       type: "list",
-       name: "roleId",
-       message: "What is the employees role?" ,
-       choices: roleChoices
-    })
-    employee.role_id = roleId 
-    await DB.plusEmployees(employee)
+    const {roleId} = await prompt ([
+        {
+            name: "roleId",
+            type: "list",
+            message: "What role do you want to assign the employee?",
+            choices: roleChoices
+        }
+    ])
+    await DB.newRoles(roleId, employeeId)
     loadPrompts()
-
-    
 }
-
-
 
 function init() {
     loadPrompts()
 }
 init()
-

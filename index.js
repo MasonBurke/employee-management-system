@@ -12,7 +12,7 @@ class DB {
         return this.connection.query("SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department ON role.department_id = department.id")
     }
     allDepartments() {
-        return this.connection.query("SELECT department.id, department.name, SUM (role.salary) AS utilize_budget FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id GROUP BY department.id, department.name")
+        return this.connection.query("SELECT department.id, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id GROUP BY department.id, department.name")
     }
     plusEmployees(employee){
         return this.connection.query("INSERT INTO employee SET ?", employee)
