@@ -1,5 +1,6 @@
 const { prompt } = require("inquirer")
 const DB = require("./index")
+require("console.table")
 
 const options = [
     {
@@ -56,6 +57,54 @@ async function loadPrompts() {
 
     }
 }
+
+async function viewDepartments(){
+const departments = await DB.allDepartments()
+console.table(departments)
+loadPrompts()
+}
+
+async function viewRoles(){
+    const roles = await DB.allRoles()
+    console.table(roles)
+    loadPrompts()
+}
+
+async function viewEmployees(){
+    const employee = await DB.allEmployees()
+    console.table(employee)
+    loadPrompts()
+}
+
+async function addEmployees(){
+    const roles = await DB.allRoles()
+    const employee = await prompt ([
+       {
+           name: "first_name",
+           message: "What is your employees first name?"
+       } ,{
+           name: "Last_name",
+           message: "what is your employees last name?"
+       }
+    ])
+    const roleChoices = roles.map(({id, title})=>({
+        name: title,
+        value: id
+    }))
+
+    const {roleId} = await prompt ({
+       type: "list",
+       name: "roleId",
+       message: "What is the employees role?" ,
+       choices: roleChoices
+    })
+    employee.role_id = roleId 
+    await DB.plusEmployees(employee)
+    loadPrompts()
+
+}
+
+
 
 function init() {
     loadPrompts()

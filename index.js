@@ -5,34 +5,31 @@ class DB {
     constructor(connection) {
         this.connection = connection
     }
-    viewEmployees() {
-        return this.connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department")
+    allEmployees() {
+        return this.connection.query("SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ")
     }
-    viewRoles() {
+    allRoles() {
         return this.connection.query("SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department ON role.department_id = department.id")
     }
-    viewDepartments() {
-        return this.connection.query("SELECT department.id, department.name ")
+    allDepartments() {
+        return this.connection.query("SELECT department.id, department.name, SUM (role.salary) AS utilize_budget FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id GROUP BY department.id, department.name")
     }
-    addEmployees(){
-        return this.connection.query("SELECT employee.id")
+    plusEmployees(employee){
+        return this.connection.query("INSERT INTO employee SET ?", employee)
     }
-    addRoles(){
-        return this.connection.query("SELECT role.id")
+    plusRoles(role){
+        return this.connection.query("INSERT INTO role SET ?", role)
     }
-    addDepartments(){
-        return this.connection.query("SELECT department.id")
+    plusDepartments(department){
+        return this.connection.query("INSERT INTO department SET ?", department)
     }
-    updateRoles(){
-        return this.connection.query("SELECT role.id")
-    }
-    exit(){
-        return this.connection.query("")
-    }
+    newRoles(roleID, employeeID){
+        return this.connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleID, employeeID])
+        }
 
 }
 
 
-module.exports = DB
+module.exports =  new DB(connection)
 
 
